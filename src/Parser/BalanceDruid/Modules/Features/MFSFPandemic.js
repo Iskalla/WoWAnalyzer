@@ -5,57 +5,100 @@ import SpellLink from 'common/SpellLink';
 import { formatNumber } from 'common/format';
 
 class MFSFPandemic extends Module {
-  _castQueue = {
-    empowered: false,
-    enemies: 0,
-  };
-  casts = [];
-  _lunarEmpsOn = false;
+  MFcasts = [];
+  SFcasts = [];
 
-  suboptUmempLS = 0;
+  moonfireDebuffs = [];
 
+  isMoonfireCast(event) {
+    const spellId = event.ability.guid;
+    return spellId === SPELLS.MOONFIRE.id;
+  }
+  isSunfireCast(event) {
+    const spellId = event.ability.guid;
+    return spellId === SPELLS.SUNFIRE_CAST.id;
+  }
   isMoonfire(event) {
     const spellId = event.ability.guid;
     return spellId === SPELLS.MOONFIRE_BEAR.id;
   }
-  isLunarEmpowerment(event) {
+  isSunfire(event) {
     const spellId = event.ability.guid;
-    return spellId === SPELLS.LUNAR_EMP_BUFF.id;
+    return spellId === SPELLS.SUNFIRE.id;
   }
+
+  on_byPlayer_cast(event) {
+    if (this.isMoonfireCast(event)){
+      this.MFcasts.push(
+        {
+          timestamp: event.timestamp,
+          targets: [],
+        }
+      );
+    }
+
+    if (this.isSunfireCast(event)){
+      this.SFcasts.push(
+        {
+          timestamp: event.timestamp,
+          targets: [],
+        }
+      );
+    }
+  }
+
 
   on_byPlayer_applydebuff(event) {
-    if (!this.isLunarStrike(event)) {
-      return;
+    if (this.isMoonfire(event)){
+      this.MFcasts[this.MFcasts.length - 1].targets.push(
+        {
+          type: 'apply',
+          target: event.targetID,
+          timestamp: event.timestamp,
+          source: event.ability.name,
+        }
+      );
     }
-    this.casts.push(this._castQueue);
-    this._castQueue = {
-      empowered: this._lunarEmpsOn,
-      enemies: 0,
-    };
+
+    if (this.isSunfire(event)){
+      this.SFcasts[this.SFcasts.length - 1].targets.push(
+        {
+          type: 'apply',
+          target: event.targetID,
+          timestamp: event.timestamp,
+          source: event.ability.name,
+        }
+      );
+    }
   }
 
-  on_byPlayer_damage(event) {
-    if (!this.isLunarStrike(event)) {
-      return;
+  on_byPlayer_refreshdebuff(event) {
+    if (this.isMoonfire(event)){
+      this.MFcasts[this.MFcasts.length - 1].targets.push(
+        {
+          type: 'refresh',
+          target: event.targetID,
+          timestamp: event.timestamp,
+          source: event.ability.name,
+        }
+      );
     }
-    this._castQueue.enemies += 1;
-  }
 
-  on_toPlayer_applybuff(event) {
-    if (this.isLunarEmpowerment(event)) {
-      this._lunarEmpsOn = true;
-    }
-  }
-  on_toPlayer_removebuff(event) {
-    if (this.isLunarEmpowerment(event)) {
-      this._lunarEmpsOn = false;
+    if (this.isSunfire(event)){
+      if (!this.SFcasts[this.SFcasts.length - 1]) return;
+      this.SFcasts[this.SFcasts.length - 1].targets.push(
+        {
+          type: 'refresh',
+          target: event.targetID,
+          timestamp: event.timestamp,
+          source: event.ability.name,
+        }
+      );
     }
   }
 
   on_finished() {
-    this.casts.push(this._castQueue);
-
-    this.suboptUmempLS = this.casts.filter((cast) =>  !cast.empowered && cast.enemies > 0 && cast.enemies < 3).length;
+    const a = 1;
   }
 
   /*suggestions(when) {

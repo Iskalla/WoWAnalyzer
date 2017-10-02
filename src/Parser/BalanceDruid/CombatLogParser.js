@@ -21,6 +21,7 @@ import LEmpowerment from './Modules/Features/LunarEmpowerment';
 import SEmpowerment from './Modules/Features/SolarEmpowerment';
 import AstralPower from './Modules/Features/AstralPower';
 import UnempoweredLs from './Modules/Spells/UnempoweredLs';
+import MFSFPandemic from './Modules/Features/MFSFPandemic';
 
 
 class CombatLogParser extends MainCombatLogParser {
@@ -42,6 +43,7 @@ class CombatLogParser extends MainCombatLogParser {
     swempowerment: SEmpowerment,
     astralpower: AstralPower,
     unempoweredLS: UnempoweredLs,
+    mFSFPandemic: MFSFPandemic,
   };
 
   generateResults() {
