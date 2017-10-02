@@ -8,8 +8,6 @@ class MFSFPandemic extends Module {
   MFcasts = [];
   SFcasts = [];
 
-  moonfireDebuffs = [];
-
   isMoonfireCast(event) {
     const spellId = event.ability.guid;
     return spellId === SPELLS.MOONFIRE.id;
