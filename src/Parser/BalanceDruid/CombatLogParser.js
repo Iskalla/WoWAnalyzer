@@ -37,6 +37,7 @@ class CombatLogParser extends MainCombatLogParser {
     castEfficiency: CastEfficiency,
     lsempowerment: LEmpowerment,
     swempowerment: SEmpowerment,
+    mFSFPandemic: MFSFPandemic,
     //Spells
     fullmoon: FullMoon,
     halfmoon: HalfMoon,
@@ -44,12 +45,8 @@ class CombatLogParser extends MainCombatLogParser {
     newmoon: NewMoon,
     sunfire: Sunfire,
     unempoweredLS: UnempoweredLs,
-<<<<<<< HEAD
-    mFSFPandemic: MFSFPandemic,
-=======
     //Items
     emeraldDreamcatcher: EmeraldDreamcatcher,
->>>>>>> 2ead6a2654ac50b2b661a50ece59bd6d2603a8f0
   };
 
   generateResults() {

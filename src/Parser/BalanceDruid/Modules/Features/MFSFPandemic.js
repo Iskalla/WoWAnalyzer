@@ -8,6 +8,27 @@ class MFSFPandemic extends Module {
   MFcasts = [];
   SFcasts = [];
 
+  targets = {};
+
+  PANDEMIC = 0.3;
+  MOONFIRE_BASE_MS = 22000;
+  SUNFIRE_BASE_MS = 18000;
+
+  inPandemic (lastDotApplyTime, dotRefreshTime, baseDuration, dotDuration) {
+    dotTimeElapsed = lastDotApplyTime - dotRefreshTime;
+    pandemicThreshold = dotDuration - (baseDuration * PANDEMIC);
+    return dotTimeElapsed >= pandemicThreshold;
+  }
+
+  newDuration (dotApplyTime, dotRefreshTime, baseDuration, dotDuration) {
+     maxDotTime = baseDuration + (baseDuration * PANDEMIC);
+     dotTimeElapsed = lastDotApplyTime - dotRefreshTime;
+     remainingTime = Math.max(dotDuration - dotTimeElapsed, 0);
+     refreshedTime = remainingTime + baseDuration;
+     inPandemic = refreshedTime > maxDotTime;
+     return Math.min(maxDotTime, refreshedTime);
+  }
+
   isMoonfireCast(event) {
     const spellId = event.ability.guid;
     return spellId === SPELLS.MOONFIRE.id;
@@ -48,11 +69,16 @@ class MFSFPandemic extends Module {
 
   on_byPlayer_applydebuff(event) {
     if (this.isMoonfire(event)){
+
+      lastApplied = targets[event.targetID].moonfire.applied;
+      prevLength = targets[event.targetID].moonfire.length;
+      this.newDuration(lastApplied, event.timestamp, this.MOONFIRE_BASE_MS, prevLength);
+
       this.MFcasts[this.MFcasts.length - 1].targets.push(
         {
           type: 'apply',
           target: event.targetID,
-          timestamp: event.timestamp,
+          applied: event.timestamp,
           source: event.ability.name,
         }
       );
@@ -67,6 +93,11 @@ class MFSFPandemic extends Module {
           source: event.ability.name,
         }
       );
+    }
+
+    
+    if (!this.target[event.targetID]){
+      this.target[event.targetID] = { event.timestamp;
     }
   }
 
